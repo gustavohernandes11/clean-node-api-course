@@ -2,7 +2,7 @@ export default {
 	clearMocks: true,
 	collectCoverage: true,
 	coverageDirectory: "coverage",
-	collectCoverageFrom: ["./src/**.test**"],
+	collectCoverageFrom: ["<rootDir>/src/**.test**"],
 	coveragePathIgnorePatterns: ["\\\\node_modules\\\\"],
 	coverageProvider: "v8",
 	moduleFileExtensions: ["js", "jsx", "ts", "tsx", "json", "node"],
