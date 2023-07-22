@@ -23,7 +23,8 @@
 	},
 	"scripts": {
 		"test": "jest",
-		"test:staged": "jest --passWithNoTests --watch"
+		"test:staged": "jest --passWithNoTests --watch",
+		"prepare": "husky install"
 	},
 	"repository": {
 		"type": "git",
