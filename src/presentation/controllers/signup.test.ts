@@ -3,20 +3,35 @@ import { MissingParamError } from "../errors/missing-param-error";
 import { SignUpController } from "./signup";
 import { InvalidParamError } from "../errors/invalid-param-error";
 import { IController } from "../protocols/controller";
+import { ServerError } from "../errors/server-error";
 
 describe("SignUpController", () => {
 	type SuiType = {
 		sut: IController;
 		emailValidator: IEmailValidator;
 	};
-	class EmailValidatorStub implements IEmailValidator {
-		isValid(): boolean {
-			return true;
+
+	function makeEmailValidatorStub(): IEmailValidator {
+		class EmailValidatorStub implements IEmailValidator {
+			isValid(): boolean {
+				return true;
+			}
 		}
+
+		return new EmailValidatorStub();
 	}
-	const emailValidatorStub = new EmailValidatorStub();
+	function makeEmailValidatorThrows(): IEmailValidator {
+		class EmailValidatorStub implements IEmailValidator {
+			isValid(): boolean {
+				throw new ServerError();
+			}
+		}
+
+		return new EmailValidatorStub();
+	}
 
 	function makeSut(): SuiType {
+		const emailValidatorStub = makeEmailValidatorStub();
 		return {
 			sut: new SignUpController(emailValidatorStub),
 			emailValidator: emailValidatorStub,
@@ -92,5 +107,35 @@ describe("SignUpController", () => {
 		const httpResponse = sut.handle(httpRequest);
 		expect(httpResponse.statusCode).toBe(400);
 		expect(httpResponse.body).toEqual(new InvalidParamError("email"));
+	});
+	it("should check the correct email", () => {
+		const { sut, emailValidator } = makeSut();
+		const emailValidatorSpy = jest.spyOn(emailValidator, "isValid");
+
+		const httpRequest = {
+			body: {
+				name: "Jhon Doe",
+				email: "jhondoe@gmail.com",
+				password: 123,
+				confirmedPassword: 123,
+			},
+		};
+		sut.handle(httpRequest);
+		expect(emailValidatorSpy).toBeCalledWith(httpRequest.body.email);
+	});
+	it("should return 500 if emailValidator throws", () => {
+		const sut = new SignUpController(makeEmailValidatorThrows());
+
+		const httpRequest = {
+			body: {
+				name: "Jhon Doe",
+				email: "jhondoe@gmail.com",
+				password: 123,
+				confirmedPassword: 123,
+			},
+		};
+		const httpResponse = sut.handle(httpRequest);
+		expect(httpResponse.statusCode).toBe(500);
+		expect(httpResponse.body).toEqual(new ServerError());
 	});
 });
