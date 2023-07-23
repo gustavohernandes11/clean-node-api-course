@@ -1,9 +1,6 @@
-import { IEmailValidator } from "../protocols/email-validator";
-import { MissingParamError } from "../errors/missing-param-error";
+import { IController, IEmailValidator } from "../protocols";
+import { MissingParamError, InvalidParamError, ServerError } from "../errors";
 import { SignUpController } from "./signup";
-import { InvalidParamError } from "../errors/invalid-param-error";
-import { IController } from "../protocols/controller";
-import { ServerError } from "../errors/server-error";
 
 describe("SignUpController", () => {
 	type SuiType = {
