@@ -1,3 +1,6 @@
 {
-	"*.ts": ["eslint 'src/** --fix", "yarn run test:staged", "git add"]
+	"*.ts": [
+		"eslint --resolve-plugins-relative-to . --fix",
+		"yarn run test:staged"
+	]
 }
