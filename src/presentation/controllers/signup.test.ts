@@ -1,14 +1,11 @@
 import { IController, IEmailValidator } from "../protocols";
 import { MissingParamError, InvalidParamError, ServerError } from "../errors";
 import { SignUpController } from "./signup";
+import { IAddAccount, IAddAccountModel } from "domain/usecases/add-account";
+import { IAccountModel } from "domain/models/account";
 
 describe("SignUpController", () => {
-	type SuiType = {
-		sut: IController;
-		emailValidator: IEmailValidator;
-	};
-
-	function makeEmailValidatorStub(): IEmailValidator {
+	function makeEmailValidator(): IEmailValidator {
 		class EmailValidatorStub implements IEmailValidator {
 			isValid(): boolean {
 				return true;
@@ -17,12 +14,34 @@ describe("SignUpController", () => {
 
 		return new EmailValidatorStub();
 	}
+	function makeAddAccount() {
+		class addAccountStub implements IAddAccount {
+			add(account: IAddAccountModel): IAccountModel {
+				const fakeAccount = {
+					id: 1,
+					name: account.name,
+					email: account.email,
+					password: account.password,
+				};
+				return fakeAccount;
+			}
+		}
+		return new addAccountStub();
+	}
+
+	type SuiType = {
+		sut: IController;
+		emailValidator: IEmailValidator;
+		addAccountStub: IAddAccount;
+	};
 
 	function makeSut(): SuiType {
-		const emailValidatorStub = makeEmailValidatorStub();
+		const emailValidatorStub = makeEmailValidator();
+		const addAccountStub = makeAddAccount();
 		return {
-			sut: new SignUpController(emailValidatorStub),
+			sut: new SignUpController(emailValidatorStub, addAccountStub),
 			emailValidator: emailValidatorStub,
+			addAccountStub,
 		};
 	}
 
@@ -146,5 +165,24 @@ describe("SignUpController", () => {
 		const httpResponse = sut.handle(httpRequest);
 		expect(httpResponse.statusCode).toBe(500);
 		expect(httpResponse.body).toEqual(new ServerError());
+	});
+	it("should call AddAccount with correct parameters", () => {
+		const { sut, addAccountStub } = makeSut();
+		const addSpy = jest.spyOn(addAccountStub, "add");
+		const httpRequest = {
+			body: {
+				name: "Jhon Doe",
+				email: "jhondoe@gmail.com",
+				password: 123,
+				confirmedPassword: 123,
+			},
+		};
+
+		sut.handle(httpRequest);
+		expect(addSpy).toHaveBeenCalledWith({
+			name: "Jhon Doe",
+			email: "jhondoe@gmail.com",
+			password: 123,
+		});
 	});
 });
