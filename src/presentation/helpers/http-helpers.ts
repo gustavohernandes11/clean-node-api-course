@@ -9,3 +9,7 @@ export const serverError = (): IHttpResponse => ({
 	statusCode: 500,
 	body: new ServerError(),
 });
+export const ok = (body: any): IHttpResponse => ({
+	statusCode: 200,
+	body,
+});
