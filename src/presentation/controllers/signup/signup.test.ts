@@ -193,4 +193,17 @@ describe("SignUpController", () => {
 			password: 123,
 		});
 	});
+	it("should return 200 if valid data was provided", () => {
+		const { sut } = makeSut();
+		const httpRequest = {
+			body: {
+				name: "Jhon Doe",
+				email: "jhondoe@gmail.com",
+				password: 123,
+				confirmedPassword: 123,
+			},
+		};
+		const httpResponse = sut.handle(httpRequest);
+		expect(httpResponse.statusCode).toBe(200);
+	});
 });
