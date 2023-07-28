@@ -3,7 +3,7 @@ import { IAccountModel } from "domain/models/account";
 import { IAddAccount, IAddAccountModel } from "domain/usecases/add-account";
 
 export class DbAddAccount implements IAddAccount {
-	readonly encrypter;
+	private readonly encrypter;
 	constructor(encrypter: IEncrypter) {
 		this.encrypter = encrypter;
 	}
