@@ -66,7 +66,26 @@ describe("DbAddAccount", () => {
 		const promise = sut.add(account);
 		await expect(promise).rejects.toThrow();
 	});
-	it("should call AddAccountRepository add method with hashed password", async () => {
+	it("should call the addAccountRepository with the encrypted password", async () => {
+		const { sut, addAccountRepository } = makeSut();
+		const addSpy = jest.spyOn(addAccountRepository, "add");
+
+		const fakeAccount = {
+			id: 1,
+			name: "valid_name",
+			email: "valid_email",
+			password: "valid_password",
+		};
+
+		await sut.add(fakeAccount);
+		expect(addSpy).toHaveBeenCalledWith({
+			id: 1,
+			name: "valid_name",
+			email: "valid_email",
+			password: "encrypted_password",
+		});
+	});
+	it("should return a account", async () => {
 		const { sut } = makeSut();
 
 		const fakeAccount = {
