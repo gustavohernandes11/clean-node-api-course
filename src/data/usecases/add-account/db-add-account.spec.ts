@@ -1,6 +1,5 @@
-import { IEncrypter } from "data/protocols/encrypter";
 import { DbAddAccount } from "./db-add-account";
-import { IAddAccount } from "domain/usecases/add-account";
+import { IAddAccount, IEncrypter } from "./db-add-account-protocols";
 
 class EncrypterStub implements IEncrypter {
 	async encrypt(_: string): Promise<string> {
