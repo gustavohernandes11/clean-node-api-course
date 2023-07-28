@@ -31,4 +31,19 @@ describe("DB AddAccount", () => {
 		await sut.add(account);
 		expect(encrypterSpy).toHaveBeenCalledWith("any_password");
 	});
+	it("should throw if encrypter throws", async () => {
+		const { sut, encrypter } = makeSut();
+		jest.spyOn(encrypter, "encrypt").mockReturnValueOnce(
+			new Promise((_, reject) => reject(new Error()))
+		);
+
+		const account = {
+			name: "any_name",
+			email: "any_email",
+			password: "any_password",
+		};
+
+		const promise = sut.add(account);
+		await expect(promise).rejects.toThrow();
+	});
 });
