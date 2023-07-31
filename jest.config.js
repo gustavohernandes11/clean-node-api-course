@@ -11,6 +11,7 @@ module.exports = {
 		"**/__tests__/**/*.[jt]s?(x)",
 		"**/?(*.)+(spec|test).[tj]s?(x)",
 	],
+	preset: "@shelf/jest-mongodb",
 	testPathIgnorePatterns: ["\\\\node_modules\\\\"],
 	transform: {
 		"\\.[jt]sx?$": "ts-jest",
