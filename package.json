@@ -23,12 +23,14 @@
 		"husky": "^8.0.3",
 		"jest": "^27.2.0",
 		"lint-staged": "^13.2.3",
+		"sucrase": "^3.34.0",
 		"ts-jest": "^27.0.5",
 		"ts-node": "^10.9.1",
 		"typescript": "^5.1.6",
 		"typescript-eslint": "^0.0.1-alpha.0"
 	},
 	"scripts": {
+		"start": "sucrase-node ./src/main/server.ts",
 		"test": "jest --passWithNoTests --runInBand --no-cache",
 		"test:unit": "npm test -- --watch -c jest-unit-config.js",
 		"test:integration": "npm test -- --watch -c jest-integration-config.js",
