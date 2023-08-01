@@ -1,14 +1,13 @@
 import request from "supertest";
 import app from "../config/app";
+import env from "../config/env";
 import { MongoHelper } from "../../infra/db/mongodb/helpers/mongo-helper";
 import { Collection } from "mongodb";
 
 let accountCollection: Collection;
 describe("Sign up routes", () => {
 	beforeAll(async () => {
-		await MongoHelper.connect(
-			process.env.MONGO_URL || "mongodb://localhost:27017"
-		);
+		await MongoHelper.connect(process.env.MONGO_URL || env.mongoUrl);
 	});
 
 	afterAll(async () => {
@@ -23,13 +22,11 @@ describe("Sign up routes", () => {
 		await request(app)
 			.post("/api/signup")
 			.send({
-				name: "any_name",
-				email: "any_email",
-				password: "any_password",
-				passwordConfirmation: "any_password",
+				name: "Gustavo",
+				email: "gustavo.taldetal@gmail.com",
+				password: "123",
+				confirmedPassword: "123",
 			})
 			.expect(200);
-
-		expect;
 	});
 });
