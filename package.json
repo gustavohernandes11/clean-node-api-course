@@ -4,8 +4,9 @@
 	"description": "",
 	"main": "index.ts",
 	"devDependencies": {
+		"@shelf/jest-mongodb": "^2.0.3",
 		"@types/bcrypt": "^5.0.0",
-		"@types/jest": "^27.0.1",
+		"@types/jest": "^29.5.3",
 		"@types/mongodb": "^4.0.7",
 		"@types/node": "^16.9.1",
 		"@types/validator": "^13.7.17",
@@ -48,10 +49,15 @@
 	"bugs": {
 		"url": "https://github.com/gustavohernandes11/clean-node-api-course/issues"
 	},
+	"config": {
+		"mongodbMemoryServer": {
+			"version": "4.4.1"
+		}
+	},
 	"homepage": "https://github.com/gustavohernandes11/clean-node-api-course#readme",
 	"dependencies": {
 		"bcrypt": "^5.1.0",
-		"mongodb": "^5.7.0",
+		"mongodb": "^4.1.1",
 		"validator": "^13.9.0"
 	}
 }
