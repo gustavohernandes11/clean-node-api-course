@@ -5,7 +5,9 @@ import { Collection } from "mongodb";
 let accountCollection: Collection;
 describe("Account Mongo Repository", () => {
 	beforeAll(async () => {
-		await MongoHelper.connect("mongodb://localhost:27017");
+		await MongoHelper.connect(
+			process.env.MONGO_URL || "mongodb://localhost:27017"
+		);
 	});
 
 	afterAll(async () => {
