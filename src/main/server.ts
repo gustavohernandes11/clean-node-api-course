@@ -1,4 +1,11 @@
-import app from "./config/app";
+import { MongoHelper } from "infra/db/mongodb/helpers/mongo-helper";
+import env from "./config/env";
 
-const port = 4000;
-app.listen(port, () => console.log(`Server is listening the port ${port}`));
+MongoHelper.connect(env.mongoUrl)
+	.then(async () => {
+		const app = (await import("./config/app")).default;
+		app.listen(env.port, () =>
+			console.log(`Server is listening the env.port ${env.port}`)
+		);
+	})
+	.catch(() => console.error);
