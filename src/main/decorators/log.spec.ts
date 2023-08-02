@@ -5,8 +5,13 @@ import {
 	IHttpResponse,
 } from "presentation/protocols";
 
+interface SutType {
+	sut: LogControllerDecorator;
+	controllerStub: IController;
+}
+
 describe("Log Controller Decorator", () => {
-	it("should call the handle method from the controller", async () => {
+	function makeSut(): SutType {
 		class ControllerStub implements IController {
 			handle(_: IHttpRequest): Promise<IHttpResponse> {
 				return new Promise((resolve) =>
@@ -15,8 +20,14 @@ describe("Log Controller Decorator", () => {
 			}
 		}
 		const controllerStub = new ControllerStub();
-		const controllerSpy = jest.spyOn(controllerStub, "handle");
 		const sut = new LogControllerDecorator(controllerStub);
+
+		return { controllerStub, sut };
+	}
+
+	it("should call the handle method from the controller", async () => {
+		const { sut, controllerStub } = makeSut();
+		const controllerSpy = jest.spyOn(controllerStub, "handle");
 
 		const httpRequest = {
 			body: {
