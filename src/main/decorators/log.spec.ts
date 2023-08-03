@@ -55,7 +55,6 @@ describe("Log Controller Decorator", () => {
 
 		expect(controllerSpy).toHaveBeenCalledWith(httpRequest);
 	});
-
 	it("should return the same response as the controller", async () => {
 		const { sut } = makeSut();
 
@@ -63,7 +62,6 @@ describe("Log Controller Decorator", () => {
 
 		expect(response).toEqual({ statusCode: 200, body: "" });
 	});
-
 	it("should log error when the controller throws a status 500", async () => {
 		const { sut, controllerStub, logErrorRepository } = makeSut();
 		const fakeError = new Error();
