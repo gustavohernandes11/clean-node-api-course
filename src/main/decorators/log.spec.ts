@@ -5,7 +5,8 @@ import {
 	IHttpRequest,
 	IHttpResponse,
 } from "../../presentation/protocols";
-import { serverError } from "../../presentation/helpers/http-helpers";
+import { ok, serverError } from "../../presentation/helpers/http-helpers";
+import { IAccountModel } from "../../domain/models/account";
 
 interface SutType {
 	sut: LogControllerDecorator;
@@ -14,20 +15,24 @@ interface SutType {
 }
 
 describe("Log Controller Decorator", () => {
-	const httpRequest: IHttpRequest = {
+	const makeFakeRequest = (): IHttpRequest => ({
 		body: {
-			name: "johndoe",
-			email: "johndoe@gmail.com",
-			password: 123,
-			confirmedPassword: 123,
+			name: "Jhon Doe",
+			email: "jhondoe@gmail.com",
+			password: "123",
+			confirmedPassword: "123",
 		},
-	};
+	});
+	const makeFakeAccount = (): IAccountModel => ({
+		id: 1,
+		name: "Jhon Doe",
+		email: "jhondoe@gmail.com",
+		password: "123",
+	});
 
 	class ControllerStub implements IController {
 		handle(_: IHttpRequest): Promise<IHttpResponse> {
-			return new Promise((resolve) =>
-				resolve({ statusCode: 200, body: "" })
-			);
+			return new Promise((resolve) => resolve(ok(makeFakeAccount())));
 		}
 	}
 	class LogErrorRepositoryStub implements ILogErrorRepository {
@@ -51,16 +56,17 @@ describe("Log Controller Decorator", () => {
 		const { sut, controllerStub } = makeSut();
 		const controllerSpy = jest.spyOn(controllerStub, "handle");
 
-		await sut.handle(httpRequest);
+		const request = makeFakeRequest();
+		await sut.handle(request);
 
-		expect(controllerSpy).toHaveBeenCalledWith(httpRequest);
+		expect(controllerSpy).toHaveBeenCalledWith(request);
 	});
 	it("should return the same response as the controller", async () => {
 		const { sut } = makeSut();
 
-		const response = await sut.handle(httpRequest);
+		const response = await sut.handle(makeFakeRequest());
 
-		expect(response).toEqual({ statusCode: 200, body: "" });
+		expect(response).toEqual(ok(makeFakeAccount()));
 	});
 	it("should log error when the controller throws a status 500", async () => {
 		const { sut, controllerStub, logErrorRepository } = makeSut();
@@ -72,7 +78,7 @@ describe("Log Controller Decorator", () => {
 		);
 		const logSpy = jest.spyOn(logErrorRepository, "log");
 
-		await sut.handle(httpRequest);
+		await sut.handle(makeFakeRequest());
 
 		expect(logSpy).toHaveBeenCalledWith(fakeError.stack);
 	});
