@@ -15,6 +15,13 @@ import {
 import { LoginController } from "./login";
 
 describe("LoginController", () => {
+	const makeFakeRequest = (): IHttpRequest => ({
+		body: {
+			email: "jhondoe@gmail.com",
+			password: "123",
+		},
+	});
+
 	function makeAuthenticationStub(): IAuthentication {
 		class AuthenticationStub implements IAuthentication {
 			auth(_: string, __: string): boolean {
@@ -94,12 +101,7 @@ describe("LoginController", () => {
 	it("should verify the correct email with emailValidator", async () => {
 		const { sut, emailValidatorStub } = makeSut();
 		const isValidSpy = jest.spyOn(emailValidatorStub, "isValid");
-		const httpRequest: IHttpRequest = {
-			body: {
-				email: "jhondoe@gmail.com",
-				password: "123",
-			},
-		};
+		const httpRequest: IHttpRequest = makeFakeRequest();
 		await sut.handle(httpRequest);
 		expect(isValidSpy).toHaveBeenCalledWith("jhondoe@gmail.com");
 	});
@@ -108,24 +110,14 @@ describe("LoginController", () => {
 		jest.spyOn(emailValidatorStub, "isValid").mockImplementationOnce(() => {
 			throw new Error();
 		});
-		const httpRequest: IHttpRequest = {
-			body: {
-				email: "jhondoe@gmail.com",
-				password: "123",
-			},
-		};
+		const httpRequest: IHttpRequest = makeFakeRequest();
 		const response = await sut.handle(httpRequest);
 		expect(response).toEqual(serverError());
 	});
 	it("should call authentication with correct values", async () => {
 		const { sut, authenticationStub } = makeSut();
 		const authSpy = jest.spyOn(authenticationStub, "auth");
-		const httpRequest: IHttpRequest = {
-			body: {
-				email: "jhondoe@gmail.com",
-				password: "123",
-			},
-		};
+		const httpRequest: IHttpRequest = makeFakeRequest();
 		await sut.handle(httpRequest);
 		expect(authSpy).toHaveBeenCalledWith("jhondoe@gmail.com", "123");
 	});
