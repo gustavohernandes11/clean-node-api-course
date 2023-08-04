@@ -1,26 +1,26 @@
+import { IAuthentication } from "../../../domain/usecases/authentication";
 import {
 	MissingParamError,
 	InvalidParamError,
-	ServerError,
 } from "../../../presentation/errors";
 import {
 	badRequest,
-	ok,
 	serverError,
 } from "../../../presentation/helpers/http-helpers";
-import { SignUpController } from "../signup/signup";
-import {
-	IEmailValidator,
-	IAddAccount,
-	IAddAccountModel,
-	IAccountModel,
-	IController,
-	IHttpRequest,
-} from "../signup/signup-protocols";
+import { IEmailValidator, IController } from "../signup/signup-protocols";
 import { LoginController } from "./login";
 
 describe("LoginController", () => {
-	function makeEmailValidator(): IEmailValidator {
+	function makeAuthenticationStub(): IAuthentication {
+		class AuthenticationStub implements IAuthentication {
+			auth(_: string, __: string): boolean {
+				return true;
+			}
+		}
+
+		return new AuthenticationStub();
+	}
+	function makeEmailValidatorStub(): IEmailValidator {
 		class EmailValidatorStub implements IEmailValidator {
 			isValid(): boolean {
 				return true;
@@ -33,13 +33,16 @@ describe("LoginController", () => {
 	type SuiType = {
 		sut: IController;
 		emailValidatorStub: IEmailValidator;
+		authenticationStub: IAuthentication;
 	};
 
 	function makeSut(): SuiType {
-		const emailValidatorStub = makeEmailValidator();
+		const emailValidatorStub = makeEmailValidatorStub();
+		const authenticationStub = makeAuthenticationStub();
 		return {
-			sut: new LoginController(emailValidatorStub),
+			sut: new LoginController(emailValidatorStub, authenticationStub),
 			emailValidatorStub,
+			authenticationStub,
 		};
 	}
 
@@ -109,5 +112,17 @@ describe("LoginController", () => {
 		};
 		const response = await sut.handle(httpRequest);
 		expect(response).toEqual(serverError());
+	});
+	it("should call authentication with correct values", async () => {
+		const { sut, authenticationStub } = makeSut();
+		const authSpy = jest.spyOn(authenticationStub, "auth");
+		const httpRequest = {
+			body: {
+				email: "jhondoe@gmail.com",
+				password: "123",
+			},
+		};
+		await sut.handle(httpRequest);
+		expect(authSpy).toHaveBeenCalledWith("jhondoe@gmail.com", "123");
 	});
 });
