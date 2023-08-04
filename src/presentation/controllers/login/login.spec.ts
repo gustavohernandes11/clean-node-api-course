@@ -96,4 +96,18 @@ describe("LoginController", () => {
 		await sut.handle(httpRequest);
 		expect(isValidSpy).toHaveBeenCalledWith("jhondoe@gmail.com");
 	});
+	it("should return 500 if email validator throws", async () => {
+		const { sut, emailValidatorStub } = makeSut();
+		jest.spyOn(emailValidatorStub, "isValid").mockImplementationOnce(() => {
+			throw new Error();
+		});
+		const httpRequest = {
+			body: {
+				email: "jhondoe@gmail.com",
+				password: "123",
+			},
+		};
+		const response = await sut.handle(httpRequest);
+		expect(response).toEqual(serverError());
+	});
 });
