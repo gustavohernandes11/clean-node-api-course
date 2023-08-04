@@ -1,4 +1,3 @@
-import { IAuthentication } from "../../../domain/usecases/authentication";
 import {
 	MissingParamError,
 	InvalidParamError,
@@ -7,7 +6,12 @@ import {
 	badRequest,
 	serverError,
 } from "../../../presentation/helpers/http-helpers";
-import { IEmailValidator, IController } from "../signup/signup-protocols";
+import {
+	IEmailValidator,
+	IController,
+	IAuthentication,
+	IHttpRequest,
+} from "./login-protocols";
 import { LoginController } from "./login";
 
 describe("LoginController", () => {
@@ -48,7 +52,7 @@ describe("LoginController", () => {
 
 	it("should return 400 if email was not provided", async () => {
 		const { sut } = makeSut();
-		const httpRequest = {
+		const httpRequest: IHttpRequest = {
 			body: {
 				password: "123",
 			},
@@ -61,7 +65,7 @@ describe("LoginController", () => {
 	});
 	it("should return 400 if password is not provided", async () => {
 		const { sut } = makeSut();
-		const httpRequest = {
+		const httpRequest: IHttpRequest = {
 			body: {
 				email: "johndoe@gmail.com",
 			},
@@ -75,7 +79,7 @@ describe("LoginController", () => {
 	it("should return 400 if invalid email is provided", async () => {
 		const { sut, emailValidatorStub } = makeSut();
 		jest.spyOn(emailValidatorStub, "isValid").mockReturnValueOnce(false);
-		const httpRequest = {
+		const httpRequest: IHttpRequest = {
 			body: {
 				email: "invalid_email",
 				password: "123",
@@ -90,7 +94,7 @@ describe("LoginController", () => {
 	it("should verify the correct email with emailValidator", async () => {
 		const { sut, emailValidatorStub } = makeSut();
 		const isValidSpy = jest.spyOn(emailValidatorStub, "isValid");
-		const httpRequest = {
+		const httpRequest: IHttpRequest = {
 			body: {
 				email: "jhondoe@gmail.com",
 				password: "123",
@@ -104,7 +108,7 @@ describe("LoginController", () => {
 		jest.spyOn(emailValidatorStub, "isValid").mockImplementationOnce(() => {
 			throw new Error();
 		});
-		const httpRequest = {
+		const httpRequest: IHttpRequest = {
 			body: {
 				email: "jhondoe@gmail.com",
 				password: "123",
@@ -116,7 +120,7 @@ describe("LoginController", () => {
 	it("should call authentication with correct values", async () => {
 		const { sut, authenticationStub } = makeSut();
 		const authSpy = jest.spyOn(authenticationStub, "auth");
-		const httpRequest = {
+		const httpRequest: IHttpRequest = {
 			body: {
 				email: "jhondoe@gmail.com",
 				password: "123",
