@@ -38,7 +38,7 @@ export class LoginController implements IController {
 			const acessToken = await this.authentication.auth(email, password);
 			if (!acessToken) return unauthorized();
 
-			return ok("");
+			return ok({ acessToken });
 		} catch (error) {
 			return serverError();
 		}
