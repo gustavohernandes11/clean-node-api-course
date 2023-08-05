@@ -4,6 +4,7 @@ import {
 } from "../../../presentation/errors";
 import {
 	badRequest,
+	ok,
 	serverError,
 	unauthorized,
 } from "../../../presentation/helpers/http-helpers";
@@ -139,5 +140,10 @@ describe("LoginController", () => {
 		const httpRequest: IHttpRequest = makeFakeRequest();
 		const response = await sut.handle(httpRequest);
 		expect(response).toEqual(serverError());
+	});
+	it("should return 200 if valid data is provided", async () => {
+		const { sut } = makeSut();
+		const response = await sut.handle(makeFakeRequest());
+		expect(response).toEqual(ok({ acessToken: "any_token" }));
 	});
 });
