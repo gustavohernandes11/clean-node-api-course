@@ -7,6 +7,7 @@ import {
 	badRequest,
 	ok,
 	serverError,
+	unauthorized,
 } from "../../../presentation/helpers/http-helpers";
 import {
 	IController,
@@ -32,10 +33,10 @@ export class LoginController implements IController {
 				}
 			}
 			const isValid = this.emailValidator.isValid(email);
-			if (!isValid) {
-				return badRequest(new InvalidParamError("email"));
-			}
-			const authentication = this.authentication.auth(email, password);
+			if (!isValid) return badRequest(new InvalidParamError("email"));
+
+			const acessToken = await this.authentication.auth(email, password);
+			if (!acessToken) return unauthorized();
 
 			return ok("");
 		} catch (error) {
