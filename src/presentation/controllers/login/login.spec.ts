@@ -5,6 +5,7 @@ import {
 import {
 	badRequest,
 	serverError,
+	unauthorized,
 } from "../../../presentation/helpers/http-helpers";
 import {
 	IEmailValidator,
@@ -24,8 +25,8 @@ describe("LoginController", () => {
 
 	function makeAuthenticationStub(): IAuthentication {
 		class AuthenticationStub implements IAuthentication {
-			auth(_: string, __: string): boolean {
-				return true;
+			async auth(_: string, __: string): Promise<string | null> {
+				return new Promise((resolve) => resolve("any_token"));
 			}
 		}
 
@@ -120,5 +121,23 @@ describe("LoginController", () => {
 		const httpRequest: IHttpRequest = makeFakeRequest();
 		await sut.handle(httpRequest);
 		expect(authSpy).toHaveBeenCalledWith("jhondoe@gmail.com", "123");
+	});
+	it("should return 401 if authentication fails", async () => {
+		const { sut, authenticationStub } = makeSut();
+		jest.spyOn(authenticationStub, "auth").mockImplementationOnce(
+			() => new Promise((resolve) => resolve(null))
+		);
+		const httpRequest: IHttpRequest = makeFakeRequest();
+		const response = await sut.handle(httpRequest);
+		expect(response).toEqual(unauthorized());
+	});
+	it("should return 500 if authentication throws", async () => {
+		const { sut, authenticationStub } = makeSut();
+		jest.spyOn(authenticationStub, "auth").mockImplementationOnce(() => {
+			throw new Error();
+		});
+		const httpRequest: IHttpRequest = makeFakeRequest();
+		const response = await sut.handle(httpRequest);
+		expect(response).toEqual(serverError());
 	});
 });
