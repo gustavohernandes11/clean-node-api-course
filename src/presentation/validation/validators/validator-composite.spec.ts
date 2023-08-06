@@ -42,4 +42,9 @@ describe("Validator Composite", () => {
 		const error = await sut.validate({ randomParam: "" });
 		expect(error).toEqual(new InvalidParamError("exemple_param"));
 	});
+	it("should return nothing if all the validations pass", async () => {
+		const { sut } = makeSut();
+		const error = await sut.validate({ anyProperty: "any_value" });
+		expect(error).toBeFalsy();
+	});
 });
