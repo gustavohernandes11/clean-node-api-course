@@ -28,7 +28,17 @@ describe("Validator Composite", () => {
 		jest.spyOn(validations[0], "validate").mockReturnValueOnce(
 			new InvalidParamError("exemple_param")
 		);
-		jest.spyOn(validations[1], "validate").mockReturnValueOnce(new Error());
+		const error = await sut.validate({ randomParam: "" });
+		expect(error).toEqual(new InvalidParamError("exemple_param"));
+	});
+	it("should return the first error if more than one validation fails", async () => {
+		const { sut, validations } = makeSut();
+		jest.spyOn(validations[0], "validate").mockReturnValueOnce(
+			new InvalidParamError("exemple_param")
+		);
+		jest.spyOn(validations[1], "validate").mockReturnValueOnce(
+			new Error("second_error")
+		);
 		const error = await sut.validate({ randomParam: "" });
 		expect(error).toEqual(new InvalidParamError("exemple_param"));
 	});
