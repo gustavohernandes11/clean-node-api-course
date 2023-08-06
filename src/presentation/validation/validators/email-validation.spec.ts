@@ -1,4 +1,3 @@
-import { IValidation } from "../../../presentation/protocols/validation";
 import { IEmailValidator } from "../protocols";
 import { EmailValidation } from "./email-validation";
 import { InvalidParamError } from "../../../presentation/errors";
